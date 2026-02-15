@@ -10,19 +10,19 @@ export const getUsersForSidebar = async (req, res)=>{
         const userId = req.user._id;
         const filteredUsers = await User.find({_id: {$ne: userId}}).select("-password");
 
-        // Count number of messages not seen
+        // Count unseen messages using countDocuments instead of fetching full documents
         const unseenMessages = {}
         const promises = filteredUsers.map(async (user)=>{
-            const messages = await Message.find({senderId: user._id, receiverId: userId, seen: false})
-            if(messages.length > 0){
-                unseenMessages[user._id] = messages.length;
+            const count = await Message.countDocuments({senderId: user._id, receiverId: userId, seen: false})
+            if(count > 0){
+                unseenMessages[user._id] = count;
             }
         })
         await Promise.all(promises);
         res.json({success: true, users: filteredUsers, unseenMessages})
     } catch (error) {
         console.log(error.message);
-        res.json({success: false, message: error.message})
+        res.status(500).json({success: false, message: "Server error"})
     }
 }
 
@@ -42,22 +42,32 @@ export const getMessages = async (req, res) =>{
 
         res.json({success: true, messages})
 
-
     } catch (error) {
         console.log(error.message);
-        res.json({success: false, message: error.message})
+        res.status(500).json({success: false, message: "Server error"})
     }
 }
 
-// api to mark message as seen using message id
+// Mark message as seen — only if current user is the receiver
 export const markMessageAsSeen = async (req, res)=>{
     try {
         const { id } = req.params;
-        await Message.findByIdAndUpdate(id, {seen: true})
+        const message = await Message.findById(id);
+
+        if (!message) {
+            return res.status(404).json({success: false, message: "Message not found"});
+        }
+
+        if (message.receiverId.toString() !== req.user._id.toString()) {
+            return res.status(403).json({success: false, message: "Unauthorized"});
+        }
+
+        message.seen = true;
+        await message.save();
         res.json({success: true})
     } catch (error) {
         console.log(error.message);
-        res.json({success: false, message: error.message})
+        res.status(500).json({success: false, message: "Server error"})
     }
 }
 
@@ -67,6 +77,10 @@ export const sendMessage = async (req, res) =>{
         const {text, image} = req.body;
         const receiverId = req.params.id;
         const senderId = req.user._id;
+
+        if (!text && !image) {
+            return res.status(400).json({success: false, message: "Message cannot be empty"});
+        }
 
         let imageUrl;
         if(image){
@@ -86,10 +100,10 @@ export const sendMessage = async (req, res) =>{
             io.to(receiverSocketId).emit("newMessage", newMessage)
         }
 
-        res.json({success: true, newMessage});
+        res.status(201).json({success: true, newMessage});
 
     } catch (error) {
         console.log(error.message);
-        res.json({success: false, message: error.message})
+        res.status(500).json({success: false, message: "Server error"})
     }
 }

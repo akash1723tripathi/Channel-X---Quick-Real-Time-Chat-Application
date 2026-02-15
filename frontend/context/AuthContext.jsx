@@ -58,7 +58,7 @@ const login = async (state, credentials)=>{
         setOnlineUsers([]);
         axios.defaults.headers.common["token"] = null;
         toast.success("Logged out successfully")
-        socket.disconnect();
+        if (socket) socket.disconnect();
     }
 
     // Update profile function to handle user profile updates
