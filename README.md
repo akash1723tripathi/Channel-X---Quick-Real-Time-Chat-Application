@@ -4,6 +4,10 @@
 
 Channel-X is a full-stack real-time chat application built with React and Node.js, enabling users to communicate instantly with a clean, responsive UI. Live at [channelx.onrender.com](https://channelx.onrender.com).
 
+<img width="1592" height="770" alt="Screenshot 2026-02-23 020207" src="https://github.com/user-attachments/assets/475b3333-8cae-4aec-ae38-22f72516896e" />
+
+<img width="1590" height="781" alt="Screenshot 2026-02-23 020154" src="https://github.com/user-attachments/assets/be4eb78b-8c99-463e-a10d-3dc838e6a05b" />
+
 ---
 
 ## ✨ Features
@@ -156,13 +160,5 @@ The application is deployed on Render. To deploy your own instance:
 
 ---
 
-## 📄 License
 
-This project is licensed under the ISC License.
-
----
-
-## 👤 Author
-
-**Akash Tripathi**  
-GitHub: [@akash1723tripathi](https://github.com/akash1723tripathi)
+Made with ❤️ by Akash Tripathi
