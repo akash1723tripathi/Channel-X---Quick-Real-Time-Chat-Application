@@ -56,7 +56,7 @@ const login = async (state, credentials)=>{
         setToken(null);
         setAuthUser(null);
         setOnlineUsers([]);
-        axios.defaults.headers.common["token"] = null;
+        delete axios.defaults.headers.common["token"];
         toast.success("Logged out successfully")
         if (socket) socket.disconnect();
     }
@@ -94,8 +94,8 @@ const login = async (state, credentials)=>{
     useEffect(()=>{
         if(token){
             axios.defaults.headers.common["token"] = token;
+            checkAuth();
         }
-        checkAuth();
     },[])
 
     const value = {
